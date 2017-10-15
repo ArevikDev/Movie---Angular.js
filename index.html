@@ -12,6 +12,8 @@
 <!--[if lt IE 9]><script src="js/modernizr.custom.js"></script><![endif]-->
 <script src="js/functions.js"></script>
 <script src="js/app.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.11/angular-route.js"></script>
+
 </head>
 <body ng-app="movieApp" ng-controller="movieGetInfo">
 <!-- wrapper -->
@@ -44,21 +46,30 @@
         <section class="content">
           <!-- post -->
           <div class="post" >
-            <!-- post-inner -->
-            <div class="post-inner" ng-repeat="res in genres">
+                        <!-- post-inner -->
+            <div class="post-inner" data-ng-repeat="movie in movieList.results">
               <header>
-                <h2><a href="#"></a></h2>
-                <p class="tags"><a href="#">FAMILY</a> <a href="#">COMEDY</a> <a href="#">ANIMATION</a> </p>
-                <div class="cl">{{ res | json}}</div>
+                <div class='close' data-ng-click="deleteMovie(movie.id, $index)">x</div>
+                <div>
+                <h2><a href="#">{{movie.original_title}}</a></h2>
+                <p class="tags">
+                  <span ng-repeat="gen in genres">
+                    <span ng-repeat="mov in movie.genre_ids">
+                    <a href="#" ng-repeat="res in gen| filter:{'id':  mov}:true">
+                      <span>{{res.name | uppercase}}</span>    </a>
+                    </span>
+                    </span>
+              </div>
+                <div class="cl"></div>
               </header>
-              <div class="img-holder"> <a href="#"><img src="css/images/post-img.jpg" alt=""></a> <a href="css/images/post-img.jpg" class="btn-full-image popup"><span>FULL IMAGE</span></a> </div>
+              <div class="img-holder" > <a href="#">
+                <img style="width: 100%;" ng-src="http://image.tmdb.org/t/p/w780/{{movie.backdrop_path}}" alt=""></a>
               <!-- meta -->
               <div class="meta">
-                <p class="date">APRIL 09, 2012 by <a href="#">JOHN DOE</a></p>
+                <p class="date"><span>Release Date </span>{{movie.release_date}}</p>
                 <div class="right">
                   <div class="rating-holder">
-                    <p>RATING</p>
-                    <div class="rating"> <span style="width: 100%;"></span> </div>
+                    <span>RATING:</span> <span style="width: 100%;">{{movie.vote_average}}</span>
                   </div>
                   <a href="#" class="comments">59 comments</a> </div>
                 <div class="cl">&nbsp;</div>
@@ -66,76 +77,63 @@
               <!-- end of meta -->
               <!-- post-cnt -->
               <div class="post-cnt">
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut commodo orci vitae enim volutpat dapibus. Aliquam pharetra, odio eu luctus semper, dolor libero volutpat mi, sit amet convallis tortor justo eu nisl. Cras quis felis quis felis tempor volutpat id at dui. Donec vel turpis id odio tempus mollis quis vel justo. Etiam tortor nisi, pulvinar a mattis nec, luctus sit amet odio. Morbi id commodo ligula. </p>
-                <a href="#" class="more">CONTINUE READING</a> </div>
-              <!-- end of post-cnt -->
+                <p>{{movie.overview}} </p>
+                <a href="#" class="more" ng-click="redirect(movie.id)">CONTINUE READING</a> </div>
+                            <!-- end of post-cnt -->
             </div>
             <!-- post-inner -->
           </div>
           <!-- end of post -->
-          <!-- post -->
-          <div class="post">
+
+          <div class="post" ng-if="movieDetails">
             <!-- post-inner -->
             <div class="post-inner">
               <header>
-                <h2><a href="#">MovieTitle 2 Goes Here</a></h2>
-                <p class="tags"><a href="#">FAMILY</a> <a href="#">COMEDY</a> <a href="#">ANIMATION</a> </p>
-                <div class="cl">&nbsp;</div>
-              </header>
-              <div class="img-holder"> <a href="#"><img src="css/images/post-img2.jpg" alt=""></a> <a href="css/images/post-img2.jpg" class="btn-full-image popup"><span>FULL IMAGE</span></a> </div>
-              <!-- meta -->
-              <div class="meta">
-                <p class="date">APRIL 09, 2012 by <a href="#">JOHN DOE</a></p>
-                <div class="right">
-                  <div class="rating-holder">
-                    <p>RATING</p>
-                    <div class="rating"> <span style="width: 50%;"></span> </div>
-                  </div>
-                  <a href="#" class="comments">59 comments</a> </div>
-                <div class="cl">&nbsp;</div>
+                <h2><a href="#">{{movieDetails.original_title}}</a></h2>
+                <p class="tags">
+                  <span ng-repeat="gen in genres">
+                    <span ng-repeat="mov in movieDetails.genre_ids">
+                    <a href="#" ng-repeat="res in gen| filter:{'id':  mov}:true">
+                      <span>{{res.name | uppercase}}</span>    </a>
+                    </span>
+                    </span>
+            </div>
+            <div class="cl"></div>
+            </header>
+            <div class="img-holder" > <a href="#">
+              <img style="width: 100%;" ng-src="http://image.tmdb.org/t/p/w780/{{movieDetails.backdrop_path}}" alt=""></a>
+              <img style="width: 100%;" ng-src="http://image.tmdb.org/t/p/w780/{{movieDetails.belongs_to_collection.poster_path}}" alt=""></a>
+            <!-- meta -->
+            <div class="meta">
+              <div><span class="linetitle">Release Date:</span> <span>{{movieDetails.release_date}}</span></div>
+              <div><span class="linetitle">RATING:</span> <span> {{movieDetails.vote_average}}</span></div>
+              <div><span class="linetitle">Budget:</span> <span> {{movieDetails.budget}}</span></div>
+              <div><span class="linetitle">Tagline:</span> <span> {{movieDetails.tagline}}</span></div>
+              <div><span class="linetitle">Status:</span> <span> {{movieDetails.status}}</span></div>
+              <div><span class="linetitle">Production companies:</span></div>
+              <div ng-repeat="prod in movieDetails.production_companies" >
+                <span style="margin-left: 50px;">{{prod.name}}</span>
               </div>
-              <!-- end of meta -->
+              <div ng-repeat="prod in movieDetails.production_contries" >
+                <span style="margin-left: 50px;">{{prod.name}}</span>
+              </div>
+              <div><span class="linetitle">Cast</span></div>
+              <div ng-repeat="cast in movieCast">
+                <span style="margin-left: 50px;color: #1cfe10;" class="linetitle">{{cast.character}}</span> - <span class="linetitle">{{cast.name}}</span>
+              </div>
+            </div>
               <!-- post-cnt -->
               <div class="post-cnt">
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut commodo orci vitae enim volutpat dapibus. Aliquam pharetra, odio eu luctus semper, dolor libero volutpat mi, sit amet convallis tortor justo eu nisl. Cras quis felis quis felis tempor volutpat id at dui. Donec vel turpis id odio tempus mollis quis vel justo. Etiam tortor nisi, pulvinar a mattis nec, luctus sit amet odio. Morbi id commodo ligula. </p>
-                <a href="#" class="more">CONTINUE READING</a> </div>
+                <p>{{movieDetails.overview}}</p>
               <!-- end of post-cnt -->
+            </div>
+            <div style="padding:7%">
+              <img ng-repeat="img in images.backdrops" ng-src="http://image.tmdb.org/t/p/w185/{{img.file_path}}" alt="">
             </div>
             <!-- post-inner -->
           </div>
-          <!-- end of post -->
-          <!-- post -->
-          <div class="post">
-            <!-- post-inner -->
-            <div class="post-inner">
-              <header>
-                <h2><a href="#">MovieTitle 3 Goes Here</a></h2>
-                <p class="tags"><a href="#">FAMILY</a> <a href="#">COMEDY</a> <a href="#">ANIMATION</a> </p>
-                <div class="cl">&nbsp;</div>
-              </header>
-              <div class="img-holder"> <a href="#"><img src="css/images/post-img3.jpg" alt=""></a> <a href="css/images/post-img3.jpg" class="btn-full-image popup"><span>FULL IMAGE</span></a> </div>
-              <!-- meta -->
-              <div class="meta">
-                <p class="date">APRIL 09, 2012 by <a href="#">JOHN DOE</a></p>
-                <div class="right">
-                  <div class="rating-holder">
-                    <p>RATING</p>
-                    <div class="rating"> <span style="width: 70%;"></span> </div>
-                  </div>
-                  <a href="#" class="comments">59 comments</a> </div>
-                <div class="cl">&nbsp;</div>
-              </div>
-              <!-- end of meta -->
-              <!-- post-cnt -->
-              <div class="post-cnt">
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut commodo orci vitae enim volutpat dapibus. Aliquam pharetra, odio eu luctus semper, dolor libero volutpat mi, sit amet convallis tortor justo eu nisl. Cras quis felis quis felis tempor volutpat id at dui. Donec vel turpis id odio tempus mollis quis vel justo. Etiam tortor nisi, pulvinar a mattis nec, luctus sit amet odio. Morbi id commodo ligula. </p>
-                <a href="#" class="more">CONTINUE READING</a> </div>
-              <!-- end of post-cnt -->
-            </div>
-            <!-- post-inner -->
-          </div>
-          <!-- end of post -->
-          <div class="pagination">
+
+          <div class="pagination" ng-if="!movieDetails">
             <ul>
               <li class="laquo"><a href="#"><span></span></a></li>
               <li class="active"><a href="#">1</a></li>
